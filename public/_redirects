@@ -1,0 +1,5 @@
+# Netlify redirects (if using Netlify instead)
+/*    /index.html   200
+
+# GitHub Pages doesn't support server-side redirects
+# This file is for reference if you switch to Netlify
