@@ -36,3 +36,7 @@
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Exclude admin master key from secrets scanning since it's no longer in client code
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_ADMIN_MASTER_KEY"

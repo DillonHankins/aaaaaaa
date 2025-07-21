@@ -44,23 +44,45 @@ export const useAdmin = () => {
   }, [user, authLoading]);
 
   const checkMasterKey = (key: string): boolean => {
-    const masterKey = import.meta.env.VITE_ADMIN_MASTER_KEY || 'new-secure-master-key-2025';
-    return key === masterKey;
+    // Master key validation is now handled server-side for security
+    return true; // This will be validated by the server
   };
 
   const promoteToAdmin = async (masterKey: string): Promise<boolean> => {
     if (!user) return false;
     
-    if (!checkMasterKey(masterKey)) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        return false;
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/promote-admin`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          masterKey: masterKey,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setIsAdmin(true);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error('Error promoting to admin:', error);
       return false;
     }
+  };
 
-    try {
-      const { error } = await supabase
-        .from('admin_users')
-        .insert({
-          user_id: user.id,
-          created_by: user.id
         });
 
       if (error) {
